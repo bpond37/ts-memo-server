@@ -4,6 +4,7 @@ import memosRouter from './routes/memo'
 import authRouter from './routes/auth'
 import Memo from './models/Memo';
 import User from './models/User';
+import {} from '../'
 import jwtMiddleware from './lib/jwtMiddleware'
 import * as cookieParser from 'cookie-parser'
 import * as DB from './models/index';
@@ -19,7 +20,7 @@ async function runServer(){
   app.use(cookieParser())
   app.use(cors())
   app.use(express.static(path.join(__dirname, '../../client/build/')))
-  app.use(express.static(path.join(__dirname, './abc/')))
+  app.use(express.static(path.join(__dirname, '../abc/')))
   // app.use(jwtMiddleware)
   
   //router posts
