@@ -4,7 +4,6 @@ import memosRouter from './routes/memo'
 import authRouter from './routes/auth'
 import Memo from './models/Memo';
 import User from './models/User';
-import {} from '../'
 import jwtMiddleware from './lib/jwtMiddleware'
 import * as cookieParser from 'cookie-parser'
 import * as DB from './models/index';
