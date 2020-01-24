@@ -29,9 +29,9 @@ async function runServer(){
     res.sendFile(path.join(__dirname, '../../client/build/', 'index.html'));
   })
 
-  const port = 4000;
-  app.listen(port, () => {
-    console.log('listening to port %d',port);
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => {
+    console.log('listening to port %d',PORT);
   });
 
   await sequelize
