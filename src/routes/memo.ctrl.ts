@@ -1,26 +1,28 @@
-import Post from '../models/Post';
+import Memo from '../models/Memo';
 import Joi = require('Joi');
 
-// let postId = 1;
+// let MemoId = 1;
 
-const posts =[
+const memos =[
   {
     id:1,
     title:'제목',
-    body:'내용',
+    contents:'내용',
   }
 ];
 
-/* create post
-POST /api/posts
-{title,body}
+/* create memo
+POST /api/memos
+{title,contents}
 */
 
-exports.write = async (req, res) => {
+export const write = async (req, res) => {
   //validation 
+  console.log("req.body",req)
   const schema = Joi.object().keys({
-    title: Joi.string().required(),
-    body: Joi.string().required(),
+    userId:Joi.number().required(), 
+    title: Joi.string().allow('').required(),
+    contents: Joi.string().allow('').required(),
   })
   const result = Joi.validate(req.body, schema)
   if (result.error){
@@ -28,16 +30,16 @@ exports.write = async (req, res) => {
   }
 
   //write
-  const post = req.body
-  const {id, title, body} = post
+  const memo = req.body
+  const {userId, title, contents} = memo
   
   try {
-    const post = await Post.create({
-      id: id,
+    const memo = await Memo.create({
+      userId: userId,
       title: title,
-      body: body,
+      contents: contents,
     })
-    return res.status(200).json({ data: post, msg: '글 등록 성공..' });
+    return res.status(200).json({ data: memo, msg: '메모 등록 성공..' });
   } catch (e) {
     return res.status(500).json({ msg: e.message });
   }
@@ -45,21 +47,26 @@ exports.write = async (req, res) => {
 
 // exports.write = (req,res) =>{
 //   console.log(req)
-//   const {title,body} = req.body;
-//   postId += 1;
-//   const post = {id:postId, title, body};
-//   posts.push(post);
-//   res.json(post)
+//   const {title,contents} = req.body;
+//   memoId += 1;
+//   const memo = {id:memoId, title, contents};
+//   memos.push(memo);
+//   res.json(memo)
 // } 
 
-/* post list 조회 
-GET /api/posts
+/* memo list 조회 
+GET /api/memos
 */
 
-exports.list = async ( req,res ) =>{
+export const list = async ( req,res ) =>{
+  const { userId } = req.params
   try {
-      const posts = await Post.findAll()
-      return res.status(200).json({ data:posts })
+      const memos = await Memo.findAll({
+        where: {
+          userId: userId
+        }
+      })
+      return res.status(200).json({ data:memos })
   } catch (e) {
     return res.status(500).json({ msg: e.message });
   }
@@ -67,23 +74,23 @@ exports.list = async ( req,res ) =>{
 }
 
 // exports.list = (req,res) =>{
-//   res.json(posts)
+//   res.json(memos)
 
 // }
 
 /*
 특정 포스트 조회
-GET /api/posts/:id
+GET /api/memos/:id
 */
 
-exports.read = async (req, res) =>{
+export const read = async (req, res) =>{
   const {id} = req.params
   try {
-    const post = await Post.findByPk(id)
-    if(!post){
+    const memo = await Memo.findByPk(id)
+    if(!memo){
       return res.status(404).json({msg: '해당하는 글이 없습니다.' })
     }
-    return res.status(200).json({data:post})
+    return res.status(200).json({data:memo})
   } catch (e) {
     return res.status(500).json({ msg: e.message });
   }
@@ -91,31 +98,27 @@ exports.read = async (req, res) =>{
 
 // exports.read = (req,res) =>{
 //   const {id} = req.params;
-//   const post = posts.find(p=> p.id.toString() === id);
-//   if(!post) {
+//   const memo = memos.find(p=> p.id.toString() === id);
+//   if(!memo) {
 //     return res.status(404).json({ msg: '포스트가 존재하지 않습니다.' });
 //   }
-//   res.json(post)
+//   res.json(memo)
 // }
 
 /*
-delete post
-DELETE /api/posts/:id
+delete memo
+DELETE /api/memos/:id
  */
 
-exports.remove = async (req,res) =>{
+export const remove = async (req,res) =>{
   const { id } = req.params
-  // abortion 처리 어떻게?
   try {
-    const post = await Post.destroy({
+    await Memo.destroy({
       where: {
         id: id
       }
     })
-    if(!post){
-      return res.status(404).json({msg: '해당하는 글이 없습니다.' })
-    }
-    return res.status(204)
+    return res.status(204).json({msg:'메모삭제성공'})
   } catch (e) {
     return res.status(500).json({ msg: e.message });
 
@@ -125,65 +128,65 @@ exports.remove = async (req,res) =>{
 // exports.remove = (req,res) =>{
 //   const {id} = req.params;
 //   //해당 아이디가 몇번째인지?
-//   const index = posts.findIndex(p => p.id.toString() === id);
+//   const index = memos.findIndex(p => p.id.toString() === id);
 //   //포스트가 없으면 오류 반환
 //   if(index ===-1){
 //     return res.status(404).json({msg:'포스트가 존재하지 않습니다.'})
 //   }
-//   posts.splice(index,1);
+//   memos.splice(index,1);
 //   res.status(204);
 // }
 
 /*
-update post(replace)
-PUT /api/posts/:id
-{title, body}
+update memo(replace)
+PUT /api/memos/:id
+{title, contents}
 */
 
-exports.replace = (req,res) =>{
+export const replace = (req,res) =>{
   const {id} = req.params;
-  const index = posts.findIndex(p => p.id.toString() === id);
+  const index = memos.findIndex(p => p.id.toString() === id);
   if(index === -1){
     return res.status(404).json({msg:'포스트가 존재하지 않습니다.'})
   }
-  posts[index] = {id, ...req.body,}
-  res.json(posts[index])
+  memos[index] = {id, ...req.body,}
+  res.json(memos[index])
   
 }
 
 /*
 포스트 수정(특정 필드 변경)
-PATCH /api/posts/:id
-{title, body}
+PATCH /api/memos/:id
+{title, contents}
 */
 
-exports.update = async (req, res) =>{
-
+export const update = async (req, res) =>{
+  console.log(req.body)
   //validation
   const schema = Joi.object().keys({
-    title: Joi.string(),
-    body: Joi.string()
+    title: Joi.string().allow(''),
+    contents: Joi.string().allow('')
   })
   const result = Joi.validate(req.body, schema);
   if (result.error){
     return res.status(400).json({msg:result.error})
   }
-
+  console.log("update",req.body)
   const { id } = req.params;
-  const post = req.body
-  const { title, body } = post
-  console.log("update...",title, body)
+  const memo = req.body
+  const { title, contents } = memo
+  console.log("update...",title, contents)
   try {
-    const post = await Post.update({
+    const memo = await Memo.update({
       title: title,
-      body: body,
+      contents: contents,
       updatedAt: null,
     },{
       where: {
         id:id
       }
     })
-    if(!post){
+    if(!memo){
       return res.status(404).json({msg: '해당하는 글이 없습니다.' })
     }
     return res.status(200).json({msg:'글 수정 성공'})
@@ -195,14 +198,14 @@ exports.update = async (req, res) =>{
 // exports.update = (req,res) => {
 //   //patch method 는 주어진 필드만 교체하는 메서드
 //   const {id} = req.params;
-//   const index = posts.findIndex(p => p.id.toString() ===id);
+//   const index = memos.findIndex(p => p.id.toString() ===id);
 //   if(index === -1){
 //     return res.status(404).json({msg:'포스트가 존재하지 않습니다.'})
 //   }
 //   //기존 값에 정보를 덮어 씌우기
-//   posts[index] = {
-//     ...posts[index],
+//   memos[index] = {
+//     ...memos[index],
 //     ...req.body
 //   };
-//   res.json(posts[index])
+//   res.json(memos[index])
 // }

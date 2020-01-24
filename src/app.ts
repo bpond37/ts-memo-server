@@ -1,8 +1,12 @@
 import express = require('express');
-import postsRouter from './routes/posts'
+import memosRouter from './routes/memo'
+import authRouter from './routes/auth'
+import Memo from './models/Memo';
+import User from './models/User';
+import jwtMiddleware from './lib/jwtMiddleware'
+import * as cookieParser from 'cookie-parser'
 import * as DB from './models/index';
-import Post from './models/Post';
-// import cors = require('cors')
+import * as cors from 'cors';
 
 
 
@@ -11,10 +15,13 @@ async function runServer(){
   const app = express();
 
   app.use(express.json()) //req body에 json형태로 보내면 이를 파싱
+  app.use(cookieParser())
+  app.use(cors())
+  app.use(jwtMiddleware)
 
   //router posts
-  app.use('/api/posts', postsRouter)
-  // app.use(cors())
+  app.use('/api/auth', authRouter);
+  app.use('/api/memos', memosRouter)
 
    app.get('/', (req,res)=>{
      res.send(
@@ -39,22 +46,43 @@ async function runServer(){
     force: true
   });
   
+  const user = await User.create({
+    email: 'kim@test.com',
+    password: '1234'
+  });
+
+  const user2 = await User.create({
+    email: 'lee@test.com',
+    password: '1234'
+  });
+
+  // Memo.create(
+  //   {
+  //     // id:1,
+  //     userId:user.id,
+  //     title:'test1-1',
+  //     contents:'test1-1',
+  //   }
+  // )
   
-  Post.create(
-    {
-      id:1,
-      title:'aa',
-      body:'aa',
-    }
-  )
-  
-  Post.create(
-    {
-      id:2,
-      title:'aa',
-      body:'aa',
-    }
-  )
+  // Memo.create(
+  //   {
+  //     // id:2,
+  //     userId:user.id,
+  //     title:'user1-2',
+  //     contents:'user1-2',
+  //   }
+  // )
+
+  // Memo.create(
+  //   {
+  //     // id:3,
+  //     userId:user2.id,
+  //     title:'user2',
+  //     contents:'user2',
+  //   }
+  // )
+
 }
 
 runServer()
