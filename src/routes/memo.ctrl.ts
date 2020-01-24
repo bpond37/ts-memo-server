@@ -1,5 +1,6 @@
 import Memo from '../models/Memo';
-import Joi = require('Joi');
+// import Joi = require('Joi');
+import Joi = require('@hapi/joi')
 import * as sanitizeHtml from 'sanitize-html'
 
 
@@ -24,7 +25,7 @@ export const write = async (req, res) => {
     title: Joi.string().allow('').required(),
     contents: Joi.string().allow('').required(),
   })
-  const result = Joi.validate(req.body, schema)
+  const result = schema.validate(req.body)
   if (result.error){
     return res.status(400).json({msg:result.error})
   }
@@ -174,7 +175,7 @@ export const update = async (req, res) =>{
     title: Joi.string().allow(''),
     contents: Joi.string().allow('')
   })
-  const result = Joi.validate(req.body, schema);
+  const result = schema.validate(req.body);
   if (result.error){
     return res.status(400).json({msg:result.error})
   }

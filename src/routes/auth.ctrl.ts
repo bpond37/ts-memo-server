@@ -1,5 +1,6 @@
 import User from '../models/User'
-import Joi = require('Joi');
+// import Joi = require('Joi');
+import Joi = require('@hapi/joi')
 import Memo from '../models/Memo';
 
 /*
@@ -23,14 +24,14 @@ export const register = async (req,res) =>{
     email: Joi.string()
     .email(
       { 
-        minDomainAtoms :2, 
-        tldWhitelist: ['com', 'net'] }
+        minDomainSegments :2, 
+        tlds: { allow: ['com', 'net'] } }
       )
     .required(),
     password: Joi.string().required()
   })
   
-  const result = Joi.validate(req.body, schema)
+  const result = schema.validate(req.body)
   if(result.error){
     return res.status(400).json({msg:result.error})
   }
