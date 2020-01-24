@@ -1,4 +1,5 @@
 import express = require('express');
+import path = require('path')
 import memosRouter from './routes/memo'
 import authRouter from './routes/auth'
 import Memo from './models/Memo';
@@ -13,26 +14,25 @@ import * as cors from 'cors';
 async function runServer(){
   const sequelize = DB.init()
   const app = express();
-
+  
   app.use(express.json()) //req body에 json형태로 보내면 이를 파싱
   app.use(cookieParser())
   app.use(cors())
-  app.use(jwtMiddleware)
-
+  app.use(express.static(path.join(__dirname, '../../client/build/')))
+  // app.use(jwtMiddleware)
+  
   //router posts
   app.use('/api/auth', authRouter);
   app.use('/api/memos', memosRouter)
+       
+  app.get('/', (req,res)=>{
+    res.sendFile(path.join(__dirname, '../../client/build/', 'index.html'));
+  })
 
-   app.get('/', (req,res)=>{
-     res.send(
-       '홈'
-     )
-   })
-   
-   const port = 4000;
-   app.listen(port, () => {
-     console.log('listening to port %d',port);
-   });
+  const port = 4000;
+  app.listen(port, () => {
+    console.log('listening to port %d',port);
+  });
 
   await sequelize
     .authenticate()

@@ -79,10 +79,8 @@ export const login = async (req,res) =>{
       where: { email }
     });
     if(user) {
-      console.log("1")
       const isValidPassword = user.validPassword(password);
       if(isValidPassword){
-        console.log("2")
         const token = user.generateToken();
         res.cookie('access_token', token, {
           maxAge : 1000*60*60*24*7,
@@ -114,8 +112,6 @@ export const login = async (req,res) =>{
 export const check = async (req,res) =>{
 
   const {user} = req.decoded
-  console.log('controller check')
-  console.log(user)
 
   //not logged in
   if(!user){
@@ -125,10 +121,9 @@ export const check = async (req,res) =>{
   return res.json({
     success:true,
     info:user})
-
 } 
 
-//logout 
+// logout 
 export const logout = (req,res) =>{
   res.clearCookie('access_token')
   console.log(req.cookies)

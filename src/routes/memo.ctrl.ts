@@ -1,15 +1,15 @@
 import Memo from '../models/Memo';
 import Joi = require('Joi');
+import * as sanitizeHtml from 'sanitize-html'
 
-// let MemoId = 1;
 
-const memos =[
-  {
-    id:1,
-    title:'제목',
-    contents:'내용',
-  }
-];
+// const memos =[
+//   {
+//     id:1,
+//     title:'제목',
+//     contents:'내용',
+//   }
+// ];
 
 /* create memo
 POST /api/memos
@@ -18,7 +18,7 @@ POST /api/memos
 
 export const write = async (req, res) => {
   //validation 
-  console.log("req.body",req)
+  console.log("req.body",req.body)
   const schema = Joi.object().keys({
     userId:Joi.number().required(), 
     title: Joi.string().allow('').required(),
@@ -37,7 +37,9 @@ export const write = async (req, res) => {
     const memo = await Memo.create({
       userId: userId,
       title: title,
-      contents: contents,
+      contents: contents
+      // title: sanitizeHtml(title, sanitizeOption),
+      // contents: sanitizeHtml(contents, sanitizeOption),
     })
     return res.status(200).json({ data: memo, msg: '메모 등록 성공..' });
   } catch (e) {
@@ -66,6 +68,11 @@ export const list = async ( req,res ) =>{
           userId: userId
         }
       })
+      // const body = memos.map(memo=>({
+      //   ...memo,
+      //   title: sanitizeHtml(memo.title),
+      //   contents: sanitizeHtml(memo.contents)
+      // }))
       return res.status(200).json({ data:memos })
   } catch (e) {
     return res.status(500).json({ msg: e.message });
@@ -143,16 +150,16 @@ PUT /api/memos/:id
 {title, contents}
 */
 
-export const replace = (req,res) =>{
-  const {id} = req.params;
-  const index = memos.findIndex(p => p.id.toString() === id);
-  if(index === -1){
-    return res.status(404).json({msg:'포스트가 존재하지 않습니다.'})
-  }
-  memos[index] = {id, ...req.body,}
-  res.json(memos[index])
+// export const replace = (req,res) =>{
+//   const {id} = req.params;
+//   const index = memos.findIndex(p => p.id.toString() === id);
+//   if(index === -1){
+//     return res.status(404).json({msg:'포스트가 존재하지 않습니다.'})
+//   }
+//   memos[index] = {id, ...req.body,}
+//   res.json(memos[index])
   
-}
+// }
 
 /*
 포스트 수정(특정 필드 변경)
@@ -178,8 +185,8 @@ export const update = async (req, res) =>{
   console.log("update...",title, contents)
   try {
     const memo = await Memo.update({
-      title: title,
-      contents: contents,
+      title: sanitizeHtml(title, sanitizeOption),
+      contents: sanitizeHtml(contents, sanitizeOption),
       updatedAt: null,
     },{
       where: {
@@ -191,6 +198,7 @@ export const update = async (req, res) =>{
     }
     return res.status(200).json({msg:'글 수정 성공'})
   } catch (e) {
+    console.log(e.message)
     return res.status(500).json({ msg: e.message });
   }
 }
@@ -208,4 +216,36 @@ export const update = async (req, res) =>{
 //     ...req.body
 //   };
 //   res.json(memos[index])
+// }
+
+const sanitizeOption ={
+  allowedTags : [
+    'h1',
+    'h2',
+    'b',
+    'i',
+    'u',
+    's',
+    'p',
+    'ul',
+    'ol',
+    'li',
+    'blockquote',
+    'a',
+    'img',
+  ],
+  allowedAttributes:{
+    a:['href','name','target'],
+    img:['src'],
+    li:['class'],
+  },
+  allowedSchemes:['data','http']
+};
+
+
+// const removeHtmlAndShorten = body => {
+//   const filtered = sanitizeHtml(body, {
+//     allowedTags: [],
+//   })
+//   return filtered.length< 100? filtered: `${filtered.slice(0,100)}...`
 // }
