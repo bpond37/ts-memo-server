@@ -18,7 +18,7 @@ async function runServer(){
   app.use(express.json()) //req body에 json형태로 보내면 이를 파싱
   app.use(cookieParser())
   app.use(cors())
-  app.use(express.static(path.join(__dirname, '../../client/build/')))
+  // app.use(express.static(path.join(__dirname, '../../client/build/')))
   app.use(express.static(path.join(__dirname, '../abc/')))
   // app.use(jwtMiddleware)
   
@@ -26,8 +26,8 @@ async function runServer(){
   app.use('/api/auth', authRouter);
   app.use('/api/memos', memosRouter)
        
-  app.get('/', (req,res)=>{
-    res.sendFile(path.join(__dirname, '../../client/build/', 'index.html'));
+  app.get('/*', (req,res)=>{
+    res.sendFile(path.join(__dirname, '../abc', 'index.html'));
   })
 
   const PORT = process.env.PORT || 4000;
