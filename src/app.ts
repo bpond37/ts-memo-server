@@ -19,7 +19,7 @@ async function runServer(){
   app.use(cookieParser())
   app.use(cors())
   // app.use(express.static(path.join(__dirname, '../../client/build/')))
-  app.use(express.static(path.join(__dirname, '../abc/')))
+  app.use(express.static(path.join(__dirname, '../app/')))
   // app.use(jwtMiddleware)
   
   //router posts
@@ -27,7 +27,7 @@ async function runServer(){
   app.use('/api/memos', memosRouter)
        
   app.get('*', (req,res)=>{
-    res.sendFile(path.join(__dirname, '../abc', 'index.html'));
+    res.sendFile(path.join(__dirname, '../app', 'index.html'));
   })
 
   const PORT = process.env.PORT || 4000;

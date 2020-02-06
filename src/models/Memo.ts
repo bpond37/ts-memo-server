@@ -2,8 +2,6 @@ import { Model } from 'sequelize';
 
 export default class Memo extends Model {
   public id!: number;
-  // public userId!: string;
-  // public category!: number;
   public title!: string;
   public contents!: string;
 

@@ -16,7 +16,7 @@ export function init(): Sequelize {
       allowNull: false,
     },
     email: {
-      type: new DataTypes.STRING(20),
+      type: new DataTypes.STRING(50),
       unique: true,
       autoIncrement: false,
       allowNull: false,
@@ -55,11 +55,11 @@ export function init(): Sequelize {
       allowNull: false,
     },
     title: {
-      type: new DataTypes.STRING(20),
+      type: new DataTypes.STRING(100),
       allowNull: false,
     },
     contents: {
-      type: new DataTypes.STRING(100),
+      type: new DataTypes.STRING(5000),
       allowNull: true,
     }
     }, {
